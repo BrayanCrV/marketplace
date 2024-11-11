@@ -1,0 +1,49 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.publicacionesContainer {
+  width: 350px;
+  height: calc(100vh - 45px);
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
+  background-color: #f9f9f9;
+  position: fixed;
+  top: 45px;
+}
+
+.publicacionRectangulo {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.enviadoPor {
+  font-weight: bold;
+  color: blue;
+}
+
+.mensaje {
+  margin-top: 5px;
+}
+
+.mensajeEnviadoPor {
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.puntoAzul {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: blue;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.noConversations {
+  text-align: center;
+  color: #888;
+}

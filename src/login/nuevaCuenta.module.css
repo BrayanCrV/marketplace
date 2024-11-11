@@ -1,0 +1,92 @@
+* {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.newAccountSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: url('../imagenes/fondo.jpeg') no-repeat center;
+  background-size: cover;
+}
+
+.container {
+  width: 700px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+h3 {
+  color: white;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.formulario {
+  width: 100%;
+}
+
+.inputGroup {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Espaciado horizontal */
+  margin-bottom: 30px; /* Espaciado vertical entre filas */
+}
+
+.inputContainer {
+  width: 30%;
+  position: relative;
+}
+
+.inputContainer label {
+  position: absolute;
+  top: -20px; /* Posiciona el label siempre arriba del input */
+  left: 10px;
+  color: white;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+/* Estilos para los inputs y selects */
+.inputContainer input,
+.inputContainer select {
+  width: 100%;
+  padding: 15px 10px;
+  border: none;
+  border-bottom: 2px solid white;
+  background: transparent;
+  color: white;
+}
+
+/* Estilo específico para inputs de fecha */
+.inputContainer input[type="date"] {
+  color: white;
+}
+
+.inputContainer input:focus,
+.inputContainer select:focus {
+  outline: none;
+  border-bottom-color: #00aaff; /* Cambia el color del borde inferior al foco */
+}
+
+.button1 {
+  width: 100%;
+  padding: 15px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.button1:hover {
+  background-color: #0056b3;
+}

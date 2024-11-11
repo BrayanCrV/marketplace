@@ -1,0 +1,81 @@
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 65px); /* Ajusta la altura para ignorar la navbar */
+  margin-left: 350px; /* Ajusta el margen para ignorar el sider */
+  padding: 10px;
+  overflow: hidden;
+}
+
+.messagesContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.sentMessage {
+  justify-content: flex-end;
+}
+
+.receivedMessage {
+  justify-content: flex-start;
+}
+
+.messageContent {
+  
+    max-width: 50%;         /* Ancho máximo del contenedor */
+    max-height: 200px;      /* Altura máxima del contenedor (ajusta según tus necesidades) */
+    padding: 10px;          /* Espaciado interno */
+    border-radius: 10px;    /* Bordes redondeados */
+    font-size: 14px;        /* Tamaño de la fuente */
+    overflow-wrap: break-word; /* Divide las palabras largas para que se ajusten en líneas */
+    display: inline-block;   /* Permite que el contenedor se ajuste al contenido */
+
+}
+
+.sentMessage .messageContent {
+  background-color: #007bff; /* Azul similar al de Facebook */
+  color: white;
+}
+
+.receivedMessage .messageContent {
+  background-color: #f1f1f1; /* Blanco similar al de Facebook */
+  color: black;
+}
+
+.messageDate {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+}
+
+.inputContainer input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  margin-right: 10px;
+}
+
+.inputContainer button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
