@@ -37,7 +37,7 @@ const Publicacion: React.FC = () => {
   useEffect(() => {
     // Obtener datos de la publicación
     axios
-      .get(`http://localhost:3001/ObtenerPublicacion`, {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/ObtenerPublicacion`, {
         params: { idPublicacion },
       })
       .then((response) => {
@@ -56,7 +56,7 @@ const Publicacion: React.FC = () => {
 
   const obtenerComentarios = () => {
     axios
-      .get(`http://localhost:3001/ObtenerComentarios`, {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/ObtenerComentarios`, {
         params: { idPublicacion },
       })
       .then((response) => {
@@ -80,7 +80,7 @@ const Publicacion: React.FC = () => {
     const nickname = localStorage.getItem("nickname");
 
     axios
-      .get("http://localhost:3001/ComprobarGuardados", {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/ComprobarGuardados`, {
         params: {
           idPublicacion,
           nickname,
@@ -110,7 +110,7 @@ const Publicacion: React.FC = () => {
     const nickname = localStorage.getItem("nickname");
 
     axios
-      .post("http://localhost:3001/Comentar", {
+      .post(`${process.env.REACT_APP_API_BASE_URL}/Comentar`, {
         idPublicacion,
         nickname,
         comentario: nuevoComentario,

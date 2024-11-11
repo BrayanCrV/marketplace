@@ -23,7 +23,7 @@ function ChatDetail({ nickname1, nickname2 }: ChatDetailProps) {
 
   useEffect(() => {
     const fetchChatData = () => {
-      axios.get("http://127.0.0.1:3001/obtenerConversacion", {
+      axios.get(`${process.env.REACT_APP_API_BASE_URL}/obtenerConversacion`, {
         params: {
           nickname1: nickname1,
           nickname2: nickname2,
@@ -47,7 +47,7 @@ function ChatDetail({ nickname1, nickname2 }: ChatDetailProps) {
 
   const sendMessage = () => {
     axios
-      .post("http://127.0.0.1:3001/enviarMensaje", {
+      .post(`${process.env.REACT_APP_API_BASE_URL}/enviarMensaje`, {
         nickname1: nickname1,
         nickname2: nickname2,
         mensaje: newMessage,

@@ -47,7 +47,7 @@ function Chat() {
     }
     if (nickname) {
       axios
-        .get("http://127.0.0.1:3001/obtenerUltimosMensajes", {
+        .get(`${process.env.REACT_APP_API_BASE_URL}/obtenerUltimosMensajes`, {
           params: { nickname },
         })
         .then((response) => {
