@@ -79,3 +79,32 @@
   color: white;
   cursor: pointer;
 }
+/* CSS para diseño responsivo en dispositivos móviles */
+@media (max-width: 900px) {
+  .container {
+    display: flex;
+    flex-direction: column; /* Organiza en columna en móviles */
+    height: auto; /* Ajusta la altura para evitar desbordamientos */
+  }
+
+  .publicacionesContainer {
+    width: 100%; /* Barra de conversaciones ocupa todo el ancho */
+    height: auto; /* Ajusta la altura automáticamente en móviles */
+    position: relative; /* Cambia posición fija para evitar superposición */
+    top: 0; /* Elimina cualquier offset superior */
+    border-right: none; /* Elimina borde derecho */
+    border-bottom: 1px solid #ddd; /* Añade borde inferior para separación */
+    margin-bottom: 10px; /* Espacio debajo de la barra de conversaciones */
+  }
+
+  .chatDetailContainer {
+    width: 100%; /* Contenedor del chat ocupa todo el ancho */
+    height: auto; /* Ajusta altura según el contenido */
+  }
+
+  .chatContainer {
+    margin-left: 0; /* Elimina margen izquierdo en móviles */
+    height: calc(100vh - 55px); /* Ajusta altura para evitar desbordes */
+    overflow: hidden; /* Evita el desplazamiento horizontal */
+  }
+}

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import {  Route,  Routes } from "react-router-dom";
 import Login from "./login/Login";
 import Principal from "./Principal";
 import RegistrarVendedor from "./login/RegistrarVendedor";
@@ -7,7 +7,6 @@ import RegistrarCliente from "./login/RegistrarCliente";
 import Publicacion from "./publicacion/Publicacion"
 import CrearPublicacion from "./publicacion/crearPublicacion"
 import Chat from "./chat/Chat";
-import ChatDetail from "./chat/chatdetail";
 import Guardados from "./guardados/guardados";
 import { BrowserRouter } from "react-router-dom";
 

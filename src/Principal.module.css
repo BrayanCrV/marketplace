@@ -75,3 +75,12 @@ Z
     margin-bottom: 10px;
   }
 }
+
+@media (max-width: 1000px) {
+  .publicacionesContainer {
+    display: grid;
+        width: 100%;
+        grid-template-columns: repeat(1, 1fr);
+        padding: 0px;
+  }
+}

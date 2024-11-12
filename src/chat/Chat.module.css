@@ -47,3 +47,15 @@
   text-align: center;
   color: #888;
 }
+
+@media (max-width: 900px) {
+  .publicacionesContainer {
+    width: 100%;
+    height: auto;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+    background-color: #f9f9f9;
+    position: static;
+    top: 45px;
+  }
+}

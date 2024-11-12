@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import { Link } from "react-router-dom";
 import axios from 'axios';
 
 function Login() {
@@ -12,12 +11,13 @@ function Login() {
 
   const validar_user = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("API URL:", `${process.env.REACT_APP_API_BASE_URL}/Login`);
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/Login`, {
         nickname: nickname,
         password: password,
       });
-
+      console.log(response);
       if (response.status === 200) { // Verifica que el estado sea 200
         const userData = response.data.results[0]; // Obtén el primer resultado
 
@@ -42,6 +42,7 @@ function Login() {
         }
       }
     } catch (error) {
+      console.log(error)
       alert('Fallo inicio de sesión');
     }
   };
