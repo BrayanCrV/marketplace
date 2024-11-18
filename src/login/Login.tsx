@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
+import fondo from './imagenes/fondo.jpeg';
+
 import axios from 'axios';
 
 function Login() {
@@ -62,7 +64,7 @@ function Login() {
 
   return (
     <section className="login-section"style={{ 
-      backgroundImage: `url(${process.env.REACT_APP_PUBLIC_FOLDER_URL}/fondo.jpeg)`, 
+      backgroundImage: `url(${fondo})`,
     }}>
       <div className="Login-contenedor">
         <div className="formulario">
