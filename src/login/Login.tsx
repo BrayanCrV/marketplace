@@ -63,9 +63,7 @@ function Login() {
   };
 
   return (
-    <section className="login-section"style={{ 
-      backgroundImage: `url(${fondo})`,
-    }}>
+    <section className="login-section">
       <div className="Login-contenedor">
         <div className="formulario">
           <form onSubmit={validar_user}>
