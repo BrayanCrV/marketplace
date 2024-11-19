@@ -48,7 +48,12 @@ function RegistrarVendedor() {
   };
 
   return (
-    <section className={styles.newAccountSection}>
+    <section className={styles.newAccountSection} style={{
+      backgroundImage: `url(${process.env.REACT_APP_PUBLIC_FOLDER_URL}/fondo.jpeg)`,
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      backgroundSize: 'cover', // Opcional, asegura que la imagen se ajuste bien al contenedor
+    }}>
       <div className={styles.container}>
         <div className={styles.formulario}>
           <form action="#">

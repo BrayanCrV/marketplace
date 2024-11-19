@@ -63,7 +63,7 @@ function Login() {
   };
 
   return (
-    <section className="login-section">
+    <section className="login-section" style={{ backgroundImage: `url(${process.env.REACT_APP_PUBLIC_FOLDER_URL}/fondo.jpeg)` }}>
       <div className="Login-contenedor">
         <div className="formulario">
           <form onSubmit={validar_user}>
