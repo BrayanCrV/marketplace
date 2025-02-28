@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import fondo from './imagenes/fondo.jpeg';
+import Cookies from 'js-cookie';
+
+import { jwtDecode } from "jwt-decode";
+
 
 import axios from 'axios';
 
@@ -13,35 +16,48 @@ function Login() {
 
   const validar_user = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("API URL:", `${process.env.REACT_APP_API_BASE_URL}/Login`);
+    console.log("API URL:", `${process.env}`);
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/Login`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
         nickname: nickname,
-        password: password,
+        pass: password,
       });
       console.log(response);
       if (response.status === 200) { // Verifica que el estado sea 200
-        const userData = response.data.results[0]; // Obtén el primer resultado
-
-        if (response.data.message === 'usuario valido') {
+       // Obtén el primer resultado
+        console.log("Es la data" , response.data)
+        console.log("jwt" , response.data.jwt)
+        const token= response.data.jwt;
+        Cookies.set('jwtToken', token, { expires: 1, secure: true, sameSite: 'strict' });
           // Guarda el nickname y el resto de los datos
-          localStorage.setItem('msg', nickname);
-          localStorage.setItem("nickname", nickname);
-          localStorage.setItem("userData", JSON.stringify(userData)); // Guardar los datos completos en localStorage
+        localStorage.setItem('msg', nickname);
+        localStorage.setItem("nickname", nickname);
+        
+        const decodedToken = jwtDecode<{ sub: string; tipo: string }>(token);
+        const userId = decodedToken.sub;
+        console.log("ID", userId);
+        const userType = decodedToken.tipo;
+        console.log("tipo", userType)
+        localStorage.setItem('msg', nickname);
+        localStorage.setItem("nickname", nickname);
+        localStorage.setItem("tipo", userType)
+      //  const userId = decodedToken.sub; // "35"
+     //  const userType = decodedToken.tipo;
+        //   localStorage.setItem("userData", JSON.stringify(userData)); // Guardar los datos completos en localStorage
 
           // Verifica el tipo de usuario y redirige a la página adecuada
-          if (userData.tipo === "Cliente") {
+          if (userType === "Cliente") {
             console.log("Usuario Cliente");
             navigate("/Principal");
-          } else if (userData.tipo === "Vendedor") {
+          } else if (userType === "Vendedor") {
             console.log("Usuario Vendedor");
             navigate("/Principal");
           } else {
             alert('Tipo de usuario no reconocido');
           }
         } else {
-          alert('Inicio de sesión fallido');
-        }
+        //   alert('Inicio de sesión fallido');
+         
       }
     } catch (error) {
       console.log(error)
@@ -63,7 +79,7 @@ function Login() {
   };
 
   return (
-    <section className="login-section" style={{ backgroundImage: `url(${process.env.REACT_APP_PUBLIC_FOLDER_URL}/fondo.jpeg)` }}>
+    <section className="login-section"  >
       <div className="Login-contenedor">
         <div className="formulario">
           <form onSubmit={validar_user}>

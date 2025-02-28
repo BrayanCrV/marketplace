@@ -10,7 +10,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  /*background: url('https://main.d3t0twfabfeg7b.amplifyapp.com/fondo.jpeg') no-repeat center;*/
+  background: url('/public/fondo.jpeg'); 
   background-size: cover;
 }
 

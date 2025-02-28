@@ -35,7 +35,7 @@ function RegistrarVendedor() {
     const data = { nickname, pass, nombres: name, apellidoP, apellidoM, fechaN: fecha, correo, telefono, calle, colonia, lote, municipio };
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}`, data);
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, data);
       console.log(response.data);
       localStorage.clear();
       localStorage.setItem('msg', nickname);
@@ -49,7 +49,7 @@ function RegistrarVendedor() {
 
   return (
     <section className={styles.newAccountSection} style={{
-      backgroundImage: `url(${process.env.REACT_APP_PUBLIC_FOLDER_URL}/fondo.jpeg)`,
+      
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center',
       backgroundSize: 'cover', // Opcional, asegura que la imagen se ajuste bien al contenedor
