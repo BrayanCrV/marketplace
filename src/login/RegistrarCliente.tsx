@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import styles from './nuevaCuenta.module.css';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
-
+import Cookies from 'js-cookie';
+import { jwtDecode } from "jwt-decode";
 function RegistrarVendedor() {
   const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [apellidoP, setApellidoP] = useState('');
   const [apellidoM, setApellidoM] = useState('');
@@ -24,20 +26,51 @@ function RegistrarVendedor() {
     }
   }, [name, apellidoP, apellidoM, fecha, correo, nickname, pass, telefono]);
 
-  const createUser = async () => {
-    const data = { nickname, pass, nombres: name, apellidoP, apellidoM, fechaN: fecha, correo, telefono, tipo:"Cliente", };
+  const createUser = () => {
+    const data = { nickname, pass, nombres: name, apellidoP, apellidoM, fechaN: fecha, correo, telefono, tipo: "Cliente", };
 
-    try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, data);
-      console.log(response.data);
-      localStorage.clear();
-      localStorage.setItem('msg', nickname);
-      localStorage.setItem("nickname", nickname);
-      localStorage.setItem("userData", JSON.stringify(data));
-      window.location.href = "/Principal";
-    } catch (error) {
-      console.error(error);
-    }
+    axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, data)
+      .then((response) => {
+        const data = response.data; // Acceder al primer elemento del array `results`
+        localStorage.clear();
+        localStorage.setItem("nickname", nickname);
+        if (data.numOfErrors != 0) {
+          alert(data.message);
+        }
+        else { validar_user(); }
+
+      })
+      .catch((error) => {
+        console.error("Error al registrar usuario:", error);
+      });
+
+  };
+  const validar_user = () => {
+
+    axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
+      nickname: nickname,
+      pass: pass,
+    })
+      .then(response => {
+        if (response.status === 200) { // Verifica que el estado sea 200
+          // Obtén el primer resultado
+          const token = response.data.jwt;
+          Cookies.set('jwtToken', token, { expires: 1, secure: true, sameSite: 'strict' });
+          // Guarda el nickname y el resto de los datos
+
+
+          const decodedToken = jwtDecode<{ sub: string; tipo: string }>(token);     
+          const userType = decodedToken.tipo;
+          console.log("tipo", userType)
+
+          localStorage.setItem("nickname", nickname);
+          localStorage.setItem("tipo", userType)
+          navigate("/Principal");
+
+      }})
+      .catch((error) => {
+        console.error("Error al iniciar sesion", error);
+      })
   };
 
   return (

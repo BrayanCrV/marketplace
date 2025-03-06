@@ -8,8 +8,8 @@ import Navbar from "../components/navbar"
 interface Publicacion {
   idPublicacion: number;
   foto: string;
-  Nombre: string;
-  Precio: string;
+  nombre: string;
+  precio: string;
 }
 
 function Principal() {
@@ -20,13 +20,11 @@ function Principal() {
   useEffect(() => {
     // Corregir el uso de axios para obtener las publicaciones
     const nickname = localStorage.getItem("nickname");
-    axios.get(`${process.env.REACT_APP_API_BASE_URL}/BuscarPublicacionesGuardadas`,{
-        params: {
-            nickname
-        }
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/publicacionesGuardadas`,{
+        withCredentials: true
     })
       .then(response => {
-        setPublicaciones(response.data.results[0]);
+        setPublicaciones(response.data);
       })
       .catch(error => {
         console.error("Hubo un error al obtener las publicaciones: ", error);
@@ -50,8 +48,8 @@ function Principal() {
             
               <div key={publicacion.idPublicacion} className={styles.publicacionRectangulo}>
                 <img src={publicacion.foto} alt="Imagen de la publicación" />
-                <h3 className={styles.publicationTitle}>{publicacion.Nombre}</h3>
-                <p className={styles.publicationPrice}>${publicacion.Precio}</p>
+                <h3 className={styles.publicationTitle}>{publicacion.nombre}</h3>
+                <p className={styles.publicationPrice}>${publicacion.precio}</p>
                 <button className={styles.detailsBtn} onClick={() => handlePublicacionClick(publicacion.idPublicacion)}>
                   Ver Detalles
                 </button>

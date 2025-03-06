@@ -4,16 +4,18 @@ import { useParams, useNavigate } from "react-router-dom"; // Importa useNavigat
 import styles from "./Publicacion.module.css";
 import Navbar from "../components/navbar";
 
+
 // Definición de tipos
 interface PublicacionInd {
+  id: string;
   foto: string;
-  Precio: string;
+  precio: string;
   Nombre: string;
   Descripcion: string;
   tunidad: string;
   Cantidad: string;
   nickname: string; // Propietario de la publicación
-  NombreC: string;
+  nombreC: string;
 }
 
 interface Comentario {
@@ -37,12 +39,12 @@ const Publicacion: React.FC = () => {
   useEffect(() => {
     // Obtener datos de la publicación
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/ObtenerPublicacion`, {
-        params: { idPublicacion },
+      .get(`${process.env.REACT_APP_API_BASE_URL}/api/publicaciones/${idPublicacion}`, {
+          withCredentials: true,
       })
       .then((response) => {
-        const data = response.data.results[0]; // Acceder al primer elemento del array `results`
-        setPublicacion(data[0]);
+        const data = response.data; // Acceder al primer elemento del array `results`
+        setPublicacion(data);
         console.log("publicacion", data);
       })
       .catch((error) => {
@@ -55,13 +57,12 @@ const Publicacion: React.FC = () => {
   }, [idPublicacion]);
 
   const obtenerComentarios = () => {
-    axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/ObtenerComentarios`, {
-        params: { idPublicacion },
-      })
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/comentarios/${idPublicacion}`, {
+      withCredentials: true,
+    })
       .then((response) => {
         // Formatear la fecha antes de actualizar el estado
-        const data = response.data.results[0].map((comentario: Comentario) => ({
+        const data = response.data.map((comentario: Comentario) => ({
           ...comentario,
           fecha: new Date(comentario.fecha)
             .toISOString()
@@ -80,19 +81,21 @@ const Publicacion: React.FC = () => {
     const nickname = localStorage.getItem("nickname");
 
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/ComprobarGuardados`, {
-        params: {
-          idPublicacion,
-          nickname,
-        },
+      .get(`${process.env.REACT_APP_API_BASE_URL}/api/guardados/${idPublicacion}`, {
+        withCredentials: true,
       })
       .then((response) => {
-        const data = response.data.results[0];
-        console.log("esta guardada", data);
-        setComprobarGuardados(data[0]);
-        console.log(comprobarGuardados);
+        if (response.data) {
+          console.log("Éxito:");
+          setComprobarGuardados({ resultado: 1 });
+
+      } else {
+          console.log("No encontrado");
+          setComprobarGuardados({ resultado: 0 });
+      }
       })
       .catch((error) => {
+        
         console.error("Error al comprobar si esta guardada:", error);
       });
   };
@@ -110,11 +113,12 @@ const Publicacion: React.FC = () => {
     const nickname = localStorage.getItem("nickname");
 
     axios
-      .post(`${process.env.REACT_APP_API_BASE_URL}/Comentar`, {
+      .post(`${process.env.REACT_APP_API_BASE_URL}/api/comentarios `, {
         idPublicacion,
-        nickname,
         comentario: nuevoComentario,
-      })
+        
+      },
+    {withCredentials: true})
       .then((response) => {
         setNuevoComentario(""); // Limpiar el área de comentario
         obtenerComentarios(); // Actualizar la lista de comentarios
@@ -125,13 +129,13 @@ const Publicacion: React.FC = () => {
   };
 
   const handleGuardarPublicacion = () => {
-    const nickname = localStorage.getItem("nickname");
-    axios
-      .post(`${process.env.REACT_APP_API_BASE_URL}/GuardarPublicacion`, {
-        idPublicacion,
-        nickname,
-      })
-      .then((response) => {
+    
+    axios.post(
+      `${process.env.REACT_APP_API_BASE_URL}/api/guardados/${idPublicacion}`,
+      {}, // Cuerpo vacío (si no hay datos que enviar)
+      { withCredentials: true } // Configuración (incluyendo credenciales)
+    )
+    .then((response) => {
         ComprobarGuardados();
         console.log("publicacion guardada");
       })
@@ -141,13 +145,10 @@ const Publicacion: React.FC = () => {
   };
 
   const handleEliminarPublicacion = () => {
-    const nickname = localStorage.getItem("nickname");
+  
     axios
-      .delete(`${process.env.REACT_APP_API_BASE_URL}/EliminarPublicacion`, {
-        params: {
-          idPublicacion,
-          nickname,
-        },
+      .delete(`${process.env.REACT_APP_API_BASE_URL}/api/guardados/${idPublicacion}`, {
+       withCredentials: true,
       })
       .then((response) => {
         console.log("publicacion eliminada");
@@ -175,9 +176,9 @@ const Publicacion: React.FC = () => {
         <div className={styles.publicacionDetalle}>
           <h2>{publicacion.Nombre}</h2>
           <p>{publicacion.Descripcion}</p>
-          <h3>Vendedor: {publicacion.NombreC} </h3>
+          <h3>Vendedor: {publicacion.nombreC} </h3>
           <h3>
-            Precio por {publicacion.tunidad}: ${publicacion.Precio}
+            precio por {publicacion.tunidad}: ${publicacion.precio}
           </h3>
           <h3>
             Cantidad mínima: {publicacion.Cantidad}{" "}
@@ -211,7 +212,9 @@ const Publicacion: React.FC = () => {
           value={nuevoComentario}
           onChange={(e) => setNuevoComentario(e.target.value)}
         />
-        <button onClick={handleEnviarComentario}>Enviar</button>
+        <button onClick={handleEnviarComentario} disabled={!nuevoComentario.trim()}>
+  Enviar
+</button>
         <div className={styles.comentariosLista}>
           {comentarios.map((comentario) => (
             <div key={comentario.id} className={styles.comentario}>

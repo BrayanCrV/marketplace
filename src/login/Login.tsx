@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import Cookies from 'js-cookie';
-
 import { jwtDecode } from "jwt-decode";
 
 
@@ -16,7 +15,7 @@ function Login() {
 
   const validar_user = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("API URL:", `${process.env}`);
+
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
         nickname: nickname,
@@ -38,7 +37,7 @@ function Login() {
         console.log("ID", userId);
         const userType = decodedToken.tipo;
         console.log("tipo", userType)
-        localStorage.setItem('msg', nickname);
+      
         localStorage.setItem("nickname", nickname);
         localStorage.setItem("tipo", userType)
       //  const userId = decodedToken.sub; // "35"
