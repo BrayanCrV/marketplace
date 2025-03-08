@@ -5,7 +5,7 @@ import axios from 'axios';
 import Navbar from "./components/navbar";
 import NavbarV from "./components/navbarV";
 import SearchBar from "./components/SearchBar"; 
-import api from "./funciones/api"
+
 
 // Definir la interfaz para tipar las publicaciones
 interface Publicacion {
