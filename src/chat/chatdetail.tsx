@@ -13,9 +13,10 @@ interface ChatData {
 interface ChatDetailProps {
   nickname1: string;
   nickname2: string;
+  otroUsuario: number;
 }
 
-function ChatDetail({ nickname1, nickname2 }: ChatDetailProps) {
+function ChatDetail({ nickname1, nickname2, otroUsuario }: ChatDetailProps) {
   const navigate = useNavigate();
   const [chatData, setChatData] = useState<ChatData[]>([]);
   const [newMessage, setNewMessage] = useState(""); // Estado para almacenar el nuevo mensaje
@@ -23,12 +24,9 @@ function ChatDetail({ nickname1, nickname2 }: ChatDetailProps) {
 
   useEffect(() => {
     const fetchChatData = () => {
-      axios.get(`${process.env.REACT_APP_API_BASE_URL}/obtenerConversacion`, {
-        params: {
-          nickname1: nickname1,
-          nickname2: nickname2,
-        },
-      })
+      axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/conversacion/${nickname2}`, {
+          withCredentials: true,
+        })
         .then((response) => {
           const chatInfo = response.data;
           setChatData(chatInfo);
@@ -43,15 +41,14 @@ function ChatDetail({ nickname1, nickname2 }: ChatDetailProps) {
     const intervalId = setInterval(fetchChatData, 5000); // Actualización cada 5 segundos
 
     return () => clearInterval(intervalId); // Limpia el intervalo al desmontar
-  }, [nickname1, nickname2]);
+  }, [nickname1, nickname2, otroUsuario]);
 
   const sendMessage = () => {
     axios
-      .post(`${process.env.REACT_APP_API_BASE_URL}/enviarMensaje`, {
-        nickname1: nickname1,
-        nickname2: nickname2,
+      .post(`${process.env.REACT_APP_API_BASE_URL}/api/chat`, {
         mensaje: newMessage,
-      })
+        idUsuario2: otroUsuario,
+      }, {withCredentials: true})
       .then((response) => {
         console.log("Mensaje enviado con éxito");
         setChatData(prevChatData => [

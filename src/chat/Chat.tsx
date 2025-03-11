@@ -11,11 +11,13 @@ interface Conversacion {
   fecha: Date;
   mensaje: string;
   nickname2: string;
+  otroUsuario: number;
 }
 
 interface LocationState {
   nickname1: string;
   nickname2: string;
+  otroUsuario: number;
 }
 interface UserData {
   idUsuario: number,
@@ -32,7 +34,7 @@ interface UserData {
 
 function Chat() {
   const [conversaciones, setConversaciones] = useState<Conversacion[]>([]);
-  const [selectedChat, setSelectedChat] = useState<{ nickname1: string; nickname2: string } | null>(null);
+  const [selectedChat, setSelectedChat] = useState<{ nickname1: string; nickname2: string; otroUsuario: number} | null>(null);
   const nickname = localStorage.getItem("nickname") || "";
   const [userData, setUserData] = useState<UserData | null>(null); // Cambiar a null inicial
 
@@ -47,8 +49,8 @@ function Chat() {
     }
     if (nickname) {
       axios
-        .get(`${process.env.REACT_APP_API_BASE_URL}/obtenerUltimosMensajes`, {
-          params: { nickname },
+        .get(`${process.env.REACT_APP_API_BASE_URL}/api/chatList`, {
+          withCredentials: true,
         })
         .then((response) => {
           const listaConversaciones = response.data;
@@ -80,12 +82,13 @@ function Chat() {
       setSelectedChat({
         nickname1: locationState.nickname1,
         nickname2: locationState.nickname2,
+        otroUsuario: locationState.otroUsuario,
       });
     }
   }, [locationState]);
 
-  const handleChatClick = (nickname1: string, nickname2: string) => {
-    setSelectedChat({ nickname1, nickname2 });
+  const handleChatClick = (nickname1: string, nickname2: string, otroUsuario: number) => {
+    setSelectedChat({ nickname1, nickname2, otroUsuario });
   };
 
   return (
@@ -98,7 +101,7 @@ function Chat() {
               <div
                 key={conversacion.nickname2}
                 className={styles.publicacionRectangulo}
-                onClick={() => handleChatClick(nickname, conversacion.nickname2)}
+                onClick={() => handleChatClick(nickname, conversacion.nickname2, conversacion.otroUsuario)}
               >
                 <h2 className={ styles.enviadoPor}>
                   {conversacion.nickname2}
@@ -121,7 +124,7 @@ function Chat() {
         </div>
         {selectedChat && (
           <div className={styles.chatDetailContainer}>
-            <ChatDetail nickname1={selectedChat.nickname1} nickname2={selectedChat.nickname2} />
+            <ChatDetail nickname1={selectedChat.nickname1} nickname2={selectedChat.nickname2} otroUsuario={selectedChat.otroUsuario} />
           </div>
         )}
       </div>
