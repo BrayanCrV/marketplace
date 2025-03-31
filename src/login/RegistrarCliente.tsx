@@ -34,7 +34,7 @@ function RegistrarVendedor() {
         const data = response.data; // Acceder al primer elemento del array `results`
         localStorage.clear();
         localStorage.setItem("nickname", nickname);
-        if (data.numOfErrors != 0) {
+        if (data.numOfErrors !== 0) {
           alert(data.message);
         }
         else { validar_user(); }

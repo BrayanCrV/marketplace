@@ -3,6 +3,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom"; // Importa useNavigate
 import styles from "./Publicacion.module.css";
 import Navbar from "../components/navbar";
+import NavbarV from "../components/navbarV";
 
 
 // Definición de tipos
@@ -27,6 +28,9 @@ interface Comentario {
 interface Guardados {
   resultado: 0 | 1; // Resultado es siempre 0 o 1
 }
+interface Tipo {
+  tipo: string // Restringe los valores posibles
+}
 
 const Publicacion: React.FC = () => {
   const { idPublicacion } = useParams<{ idPublicacion: string }>();
@@ -35,6 +39,7 @@ const Publicacion: React.FC = () => {
   const [comentarios, setComentarios] = useState<Comentario[]>([]);
   const [nuevoComentario, setNuevoComentario] = useState<string>("");
   const [comprobarGuardados, setComprobarGuardados] = useState<Guardados>({ resultado: 0 });
+  const [tipo, setTipo] = useState<Tipo | null>(null); 
 
   useEffect(() => {
     // Obtener datos de la publicación
@@ -50,11 +55,16 @@ const Publicacion: React.FC = () => {
       .catch((error) => {
         console.error("Error al obtener la publicación:", error);
       });
-
+      const storedTipo = localStorage.getItem("tipo");
+    if (storedTipo) {
+      setTipo({tipo: storedTipo});
+    } else {
+      console.warn("No se encontró un tipo de usuario válido en localStorage.");
+    }
     // Obtener comentarios
     obtenerComentarios();
     ComprobarGuardados();
-  }, [idPublicacion]);
+  }, []);
 
   const obtenerComentarios = () => {
     axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/comentarios/${idPublicacion}`, {
@@ -78,8 +88,6 @@ const Publicacion: React.FC = () => {
   };
 
   const ComprobarGuardados = () => {
-    const nickname = localStorage.getItem("nickname");
-
     axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/api/guardados/${idPublicacion}`, {
         withCredentials: true,
@@ -110,8 +118,6 @@ const Publicacion: React.FC = () => {
   };
 
   const handleEnviarComentario = () => {
-    const nickname = localStorage.getItem("nickname");
-
     axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/api/comentarios `, {
         idPublicacion,
@@ -167,7 +173,7 @@ const Publicacion: React.FC = () => {
   return (
     <div>
       {/* Cabecera de la página */}
-      <Navbar />
+      {tipo ? (tipo.tipo === "Cliente"? <Navbar /> : <NavbarV />) : null}
       {/* Contenido de la publicación */}
       <div className={styles.publicacionContainer}>
         <div className={styles.publicacionImagen}>

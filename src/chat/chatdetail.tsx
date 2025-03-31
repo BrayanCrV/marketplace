@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from 'axios';
-import styles from './ChatDetalles.module.css';
-import { format } from 'date-fns';
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import axios from "axios";
+import styles from "./ChatDetalles.module.css";
+import { format } from "date-fns";
+
 
 interface ChatData {
   mensaje: string;
@@ -17,57 +19,82 @@ interface ChatDetailProps {
 }
 
 function ChatDetail({ nickname1, nickname2, otroUsuario }: ChatDetailProps) {
-  const navigate = useNavigate();
   const [chatData, setChatData] = useState<ChatData[]>([]);
-  const [newMessage, setNewMessage] = useState(""); // Estado para almacenar el nuevo mensaje
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref para el scroll automático
+  const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const stompClientRef = useRef<Client | null>(null);
 
   useEffect(() => {
-    const fetchChatData = () => {
-      axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/conversacion/${nickname2}`, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          const chatInfo = response.data;
-          setChatData(chatInfo);
-        })
-        .catch((error) => {
-          console.error("Error al obtener los datos del chat", error);
+    // Configurar STOMP usando SockJS y la variable de entorno
+    const stompClient = new Client({
+      webSocketFactory: () =>
+        new SockJS(`${process.env.REACT_APP_API_BASE_URL}/api/ws`),
+      onConnect: () => {
+        console.log("Conectado a WebSocket en ChatDetail");
+        // Suscribirse al canal de chat del otro usuario
+        stompClient.subscribe(`/topic/chat/${nickname2}-${nickname1}`, (message) => {
+          const newChatMessage: ChatData = JSON.parse(message.body);
+          setChatData((prevChatData) => [...prevChatData, newChatMessage]);
+          scrollToBottom();
         });
+      },
+      onStompError: (frame) => {
+        console.error("Error en WebSocket (ChatDetail):", frame);
+      },
+      debug: (str) => console.log(str),
+    });
+
+    stompClient.activate();
+    stompClientRef.current = stompClient;
+
+    return () => {
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
+      }
     };
+  }, [nickname1, nickname2]);
 
-    // Llama a la función de obtención de datos cada 5 segundos
-    fetchChatData(); // Primera llamada
-    const intervalId = setInterval(fetchChatData, 5000); // Actualización cada 5 segundos
-
-    return () => clearInterval(intervalId); // Limpia el intervalo al desmontar
-  }, [nickname1, nickname2, otroUsuario]);
-
-  const sendMessage = () => {
+  useEffect(() => {
+    // Cargar mensajes previos
     axios
-      .post(`${process.env.REACT_APP_API_BASE_URL}/api/chat`, {
-        mensaje: newMessage,
-        idUsuario2: otroUsuario,
-      }, {withCredentials: true})
+      .get(`${process.env.REACT_APP_API_BASE_URL}/api/conversacion/${nickname2}`, {
+        withCredentials: true,
+      })
       .then((response) => {
-        console.log("Mensaje enviado con éxito");
-        setChatData(prevChatData => [
-          ...prevChatData,
-          {
-            mensaje: newMessage,
-            fecha: new Date(),
-            remitenteNickname: nickname1,
-          },
-        ]);
-        setNewMessage(""); // Limpiar el campo del nuevo mensaje
-        scrollToBottom(); // Desplaza hacia abajo después de enviar
+        setChatData(response.data);
       })
       .catch((error) => {
-        console.error("Error al enviar el mensaje", error);
+        console.error("Error al obtener datos del chat", error);
       });
+  }, [nickname1, nickname2]);
+
+  const sendMessage = () => {
+    if (newMessage.trim() === "") return;
+
+    const chatMessage = {
+      mensaje: newMessage,
+      fecha: new Date(),
+      remitenteNickname: nickname1,
+    };
+    const timeStamp = Date.now();
+
+    if (stompClientRef.current) {
+      stompClientRef.current.publish({
+        destination: "/api/app/chat",
+        body: JSON.stringify({
+          mensaje: newMessage,
+          fecha:  timeStamp,
+          remitenteNickname: nickname1,
+          receptorNickname: nickname2,
+        }),
+      });
+    }
+
+    setChatData((prev) => [...prev, chatMessage]);
+    setNewMessage("");
+    scrollToBottom();
   };
 
-  // Función para desplazar al final de los mensajes
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -75,7 +102,7 @@ function ChatDetail({ nickname1, nickname2, otroUsuario }: ChatDetailProps) {
   };
 
   useEffect(() => {
-    scrollToBottom(); // Desplaza hacia abajo al cargar los mensajes
+    scrollToBottom();
   }, [chatData]);
 
   return (
@@ -84,17 +111,21 @@ function ChatDetail({ nickname1, nickname2, otroUsuario }: ChatDetailProps) {
         {chatData.map((chat, index) => (
           <div
             key={index}
-            className={`${styles.message} ${chat.remitenteNickname === nickname1 ? styles.sentMessage : styles.receivedMessage}`}
+            className={`${styles.message} ${
+              chat.remitenteNickname === nickname1
+                ? styles.sentMessage
+                : styles.receivedMessage
+            }`}
           >
             <div className={styles.messageContent}>
               <p>{chat.mensaje}</p>
               <span className={styles.messageDate}>
-                {format(new Date(chat.fecha), 'PPpp')}
+                {format(new Date(chat.fecha), "PPpp")}
               </span>
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef} /> {/* Referencia al final de los mensajes */}
+        <div ref={messagesEndRef} />
       </div>
       <div className={styles.inputContainer}>
         <input

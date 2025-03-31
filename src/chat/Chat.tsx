@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Navbar from "../components/navbar";
@@ -19,33 +21,27 @@ interface LocationState {
   nickname2: string;
   otroUsuario: number;
 }
-interface UserData {
-  idUsuario: number,
-  nickname: string;
-  pass: string;
-  nombres: string;
-  apellidoP: string;
-  apellidoM: string;
-  fechaN: string; // Podrías usar Date si prefieres manejarlo como objeto de fecha
-  correo: string;
-  telefono: string;
+
+interface Tipo {
   tipo: string;
 }
 
 function Chat() {
   const [conversaciones, setConversaciones] = useState<Conversacion[]>([]);
-  const [selectedChat, setSelectedChat] = useState<{ nickname1: string; nickname2: string; otroUsuario: number} | null>(null);
+  const [selectedChat, setSelectedChat] = useState<LocationState | null>(null);
   const nickname = localStorage.getItem("nickname") || "";
-  const [userData, setUserData] = useState<UserData | null>(null); // Cambiar a null inicial
-
+  const [tipo, setTipo] = useState<Tipo | null>(null);
   const location = useLocation();
   const locationState = location.state as LocationState | null;
+  const [client, setClient] = useState<Client | null>(null);
 
   // Función para cargar conversaciones
   const cargarConversaciones = () => {
-    const storedUserData = localStorage.getItem("userData");
-    if (storedUserData) {
-      setUserData(JSON.parse(storedUserData));
+    const storedTipo = localStorage.getItem("tipo");
+    if (storedTipo) {
+      setTipo({ tipo: storedTipo });
+    } else {
+      console.warn("No se encontró un tipo de usuario válido en localStorage.");
     }
     if (nickname) {
       axios
@@ -53,9 +49,7 @@ function Chat() {
           withCredentials: true,
         })
         .then((response) => {
-          const listaConversaciones = response.data;
-          console.log("Conversaciones obtenidas:", listaConversaciones);
-          setConversaciones(listaConversaciones);
+          setConversaciones(response.data);
         })
         .catch((error) => {
           console.error("Error al obtener la lista de conversaciones", error);
@@ -64,36 +58,68 @@ function Chat() {
   };
 
   useEffect(() => {
-    // Carga las conversaciones al montar el componente y cada vez que cambia el nickname
     cargarConversaciones();
 
-    // Configura el intervalo para actualizar cada 5 segundos
-    const intervalId = setInterval(() => {
-      cargarConversaciones();
-    }, 5000);
+    // Configurar STOMP para el Chat (suscripción general)
+    const stompClient = new Client({
+      webSocketFactory: () =>
+        new SockJS(`${process.env.REACT_APP_API_BASE_URL}/api/ws`),
+      connectHeaders: {
+        // Agregar headers si necesitas autenticación adicional
+      },
+      onConnect: () => {
+        console.log("Conectado al WebSocket en Chat");
+        stompClient.subscribe(`/topic/chat/R/${nickname}`, (message) => {
+          const newMessage: Conversacion = JSON.parse(message.body);
 
-    // Limpia el intervalo cuando el componente se desmonte
-    return () => clearInterval(intervalId);
+          setConversaciones((prev) => {
+            const index = prev.findIndex(
+              (conv) => conv.otroUsuario === newMessage.otroUsuario
+            );
+
+            if (index !== -1) {
+              // Si ya existe, lo reemplazamos y lo movemos al principio
+              const updatedList = [...prev];
+              updatedList.splice(index, 1); // Eliminamos la conversación antigua
+              return [newMessage, ...updatedList]; // Insertamos la nueva al inicio
+            } else {
+              // Si no existe, simplemente lo agregamos al inicio
+              return [newMessage, ...prev];
+            }
+          });
+        });
+      },
+      onStompError: (frame) => {
+        console.error("Error en WebSocket (Chat):", frame);
+      },
+      debug: (str) => console.log(str),
+    });
+
+    stompClient.activate();
+    setClient(stompClient);
+
+    return () => {
+      stompClient.deactivate();
+    };
   }, [nickname]);
 
   useEffect(() => {
-    // Verifica si los datos del chat están presentes en el estado de navegación
     if (locationState && locationState.nickname1 && locationState.nickname2) {
-      setSelectedChat({
-        nickname1: locationState.nickname1,
-        nickname2: locationState.nickname2,
-        otroUsuario: locationState.otroUsuario,
-      });
+      setSelectedChat(locationState);
     }
   }, [locationState]);
 
-  const handleChatClick = (nickname1: string, nickname2: string, otroUsuario: number) => {
+  const handleChatClick = (
+    nickname1: string,
+    nickname2: string,
+    otroUsuario: number
+  ) => {
     setSelectedChat({ nickname1, nickname2, otroUsuario });
   };
 
   return (
     <div className={styles.container}>
-      {userData ? (userData.tipo === "Cliente" ? <Navbar /> : <NavbarV />) : null}
+      {tipo ? tipo.tipo === "Cliente" ? <Navbar /> : <NavbarV /> : null}
       <div className={styles.mainContent}>
         <div className={styles.publicacionesContainer}>
           {conversaciones.length > 0 ? (
@@ -101,14 +127,20 @@ function Chat() {
               <div
                 key={conversacion.nickname2}
                 className={styles.publicacionRectangulo}
-                onClick={() => handleChatClick(nickname, conversacion.nickname2, conversacion.otroUsuario)}
+                onClick={() =>
+                  handleChatClick(
+                    nickname,
+                    conversacion.nickname2,
+                    conversacion.otroUsuario
+                  )
+                }
               >
-                <h2 className={ styles.enviadoPor}>
-                  {conversacion.nickname2}
-                </h2>
+                <h2 className={styles.enviadoPor}>{conversacion.nickname2}</h2>
                 <div
                   className={
-                    conversacion.enviadoPor === nickname ?  styles.mensaje: styles.mensajeEnviadoPor
+                    conversacion.enviadoPor === nickname
+                      ? styles.mensaje
+                      : styles.mensajeEnviadoPor
                   }
                 >
                   {conversacion.enviadoPor !== nickname && (
@@ -119,18 +151,23 @@ function Chat() {
               </div>
             ))
           ) : (
-            <p className={styles.noConversations}>No hay conversaciones disponibles.</p>
+            <p className={styles.noConversations}>
+              No hay conversaciones disponibles.
+            </p>
           )}
         </div>
         {selectedChat && (
           <div className={styles.chatDetailContainer}>
-            <ChatDetail nickname1={selectedChat.nickname1} nickname2={selectedChat.nickname2} otroUsuario={selectedChat.otroUsuario} />
+            <ChatDetail
+              nickname1={selectedChat.nickname1}
+              nickname2={selectedChat.nickname2}
+              otroUsuario={selectedChat.otroUsuario}
+            />
           </div>
         )}
       </div>
     </div>
   );
-  
 }
 
 export default Chat;

@@ -19,7 +19,7 @@ function Principal() {
 
   useEffect(() => {
     // Corregir el uso de axios para obtener las publicaciones
-    const nickname = localStorage.getItem("nickname");
+    
     axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/publicacionesGuardadas`,{
         withCredentials: true
     })
