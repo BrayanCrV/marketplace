@@ -28,23 +28,23 @@
 
 .messageContent {
   
-    max-width: 50%;         /* Ancho máximo del contenedor */
-    max-height: 200px;      /* Altura máxima del contenedor (ajusta según tus necesidades) */
-    padding: 10px;          /* Espaciado interno */
-    border-radius: 10px;    /* Bordes redondeados */
-    font-size: 14px;        /* Tamaño de la fuente */
-    overflow-wrap: break-word; /* Divide las palabras largas para que se ajusten en líneas */
-    display: inline-block;   /* Permite que el contenedor se ajuste al contenido */
+    max-width: 50%;         
+    max-height: 200px;      
+    padding: 10px;          
+    border-radius: 10px;    
+    font-size: 14px;       
+    overflow-wrap: break-word; 
+    display: inline-block;  
 
 }
 
 .sentMessage .messageContent {
-  background-color: #007bff; /* Azul similar al de Facebook */
+  background-color: #007bff; 
   color: white;
 }
 
 .receivedMessage .messageContent {
-  background-color: #f1f1f1; /* Blanco similar al de Facebook */
+  background-color: #f1f1f1; 
   color: black;
 }
 
@@ -79,32 +79,32 @@
   color: white;
   cursor: pointer;
 }
-/* CSS para diseño responsivo en dispositivos móviles */
+
 @media (max-width: 900px) {
   .container {
     display: flex;
-    flex-direction: column; /* Organiza en columna en móviles */
-    height: auto; /* Ajusta la altura para evitar desbordamientos */
+    flex-direction: column; 
+    height: auto; 
   }
 
   .publicacionesContainer {
-    width: 100%; /* Barra de conversaciones ocupa todo el ancho */
-    height: auto; /* Ajusta la altura automáticamente en móviles */
-    position: relative; /* Cambia posición fija para evitar superposición */
-    top: 0; /* Elimina cualquier offset superior */
-    border-right: none; /* Elimina borde derecho */
-    border-bottom: 1px solid #ddd; /* Añade borde inferior para separación */
-    margin-bottom: 10px; /* Espacio debajo de la barra de conversaciones */
+    width: 100%; 
+    height: auto; 
+    position: relative; 
+    top: 0;  
+    border-right: none;  
+    border-bottom: 1px solid #ddd;  
+    margin-bottom: 10px;  
   }
 
   .chatDetailContainer {
-    width: 100%; /* Contenedor del chat ocupa todo el ancho */
-    height: auto; /* Ajusta altura según el contenido */
+    width: 100%; 
+    height: auto;  
   }
 
   .chatContainer {
-    margin-left: 0; /* Elimina margen izquierdo en móviles */
-    height: calc(100vh - 55px); /* Ajusta altura para evitar desbordes */
-    overflow: hidden; /* Evita el desplazamiento horizontal */
+    margin-left: 0;  
+    height: calc(100vh - 55px);  
+    overflow: hidden;  
   }
 }

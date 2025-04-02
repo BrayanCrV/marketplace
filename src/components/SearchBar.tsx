@@ -14,10 +14,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ setPublicaciones }) => {
     if (!searchTerm) return;
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/BuscarPublicaciones`, {
-        params: { searchTerm },
-      });
-      setPublicaciones(response.data.results[0]); // Actualiza las publicaciones con los resultados de la búsqueda
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/BuscarPublicaciones/${searchTerm}`, {
+        withCredentials: true,
+      })
+      
+      setPublicaciones(response.data); // Actualiza las publicaciones con los resultados de la búsqueda
     } catch (error) {
       console.error('Error buscando publicaciones:', error);
     }

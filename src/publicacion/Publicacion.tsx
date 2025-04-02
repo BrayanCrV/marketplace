@@ -44,7 +44,7 @@ const Publicacion: React.FC = () => {
   useEffect(() => {
     // Obtener datos de la publicación
     axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/api/publicaciones/${idPublicacion}`, {
+      .get(`${process.env.REACT_APP_API_BASE_URL}/api/publicacion/${idPublicacion}`, {
           withCredentials: true,
       })
       .then((response) => {
